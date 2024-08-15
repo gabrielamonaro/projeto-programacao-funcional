@@ -19,7 +19,7 @@ oponente BlackDama = [White,WhiteDama]
 oponente WhiteDama = [Black,BlackDama]
 oponente White = [Black,BlackDama]
 
-type Coord = (Int, Int)
+type Coord = (Int, Int) -- (x, y)
 type Cell = (Content, String, Coord)  -- (Conteudo, Cor, Coordenada)
 
 type Board = [[Cell]]
@@ -32,21 +32,21 @@ viraDama (x,y) valor = createCell x y valor
 --setando posições das peças no tabuleiro inicial
 initialSetCell :: Int -> Int -> Int -> Cell
 initialSetCell n x y
-    | even n =  (Empty, "\x1b[41m", (x, y)) 
+    | even n =  (Empty, "\x1b[48;5;230m", (x, y)) 
     | otherwise = if (y < 3) 
-        then (Black, "\x1b[44m", (x, y)) 
+        then (Black, "\x1b[48;5;151m", (x, y)) 
         else 
             if (y > 4) 
-                then (White, "\x1b[44m", (x, y))
-                else (Empty, "\x1b[44m", (x, y))  
+                then (White, "\x1b[48;5;151m", (x, y))
+                else (Empty, "\x1b[48;5;151m", (x, y))  
 
 emptyCell :: Int -> Int -> Int -> Cell
 emptyCell n r c
-    | even n = (Empty, "\x1b[41m", (r, c))  -- Célula com fundo vermelho
-    | otherwise = (Empty, "\x1b[44m", (r, c))  -- Célula com fundo azul
+    | even n = (Empty, "\x1b[48;5;230m", (r, c))  -- Célula com fundo vermelho
+    | otherwise = (Empty, "\x1b[48;5;151m", (r, c))  -- Célula com fundo azul
 
 createCell :: Int -> Int -> Content -> Cell
-createCell r c content = (content, "\x1b[44m", (r, c))
+createCell r c content = (content, "\x1b[48;5;151m", (r, c))
 
 emptyBoard :: Int -> Board
 emptyBoard size = [[emptyCell (y + x) x y | x <- [0..size-1]] | y <- [0..size-1]]
@@ -63,8 +63,8 @@ showBoard :: Board -> IO ()
 showBoard board = do
     let letters = "01234567"
     let numberedRows = zip [1..] board
-    putStrLn "   0  1  2  3  4  5  6  7"
     putStr (unlines (map (showRow letters) numberedRows))
+    putStrLn "   0  1  2  3  4  5  6  7"
 
   where
     showRow letters (rowNum, row) = letters !! (rowNum - 1) : " " ++ concatMap (\cell -> showCell cell ++ "") row

@@ -1,0 +1,18 @@
+/home/codespace/.ghcup/ghc/9.6.2/lib/ghc-9.6.2/lib/x86_64-linux-ghc-9.6.2/rts-1.0.2/include/ghcversion.h:
+  hash: 9cac75f8cd439ea32123c78b066817c642e99d5f6683e675c327513f36e1532e
+/usr/include/stdc-predef.h:
+  hash: 64fdf694f7b3d51ec6c45c06dcb71ebbe9455742d3ea673012016668853d3bff
+/workspaces/projeto-programacao-funcional/.stack-work/dist/x86_64-linux/ghc-9.6.2/build/autogen/Paths_projetodamas.hs:
+  hash: 0ed04b51d3361ff42a09561554220f94af55130b9a8b8f10b53ca26801e5ff48
+/workspaces/projeto-programacao-funcional/.stack-work/dist/x86_64-linux/ghc-9.6.2/build/autogen/cabal_macros.h:
+  hash: b5c0c4af776da040bf6a22c225879fbf4cc247ab28f725a685f64ff4646e2943
+/workspaces/projeto-programacao-funcional/CHANGELOG.md:
+  hash: b64ea318f2a77486033c1f449cf920d44add716915442b6ce3598a231445a856
+/workspaces/projeto-programacao-funcional/README.md:
+  hash: d1c1c305d73f118b4730f0eb1a2303340f03e3e66ce5b853d50410828d6bef0a
+/workspaces/projeto-programacao-funcional/package.yaml:
+  hash: 4fed7a19e920f970263dff4df476ee5d0119703e3e093fd49f9042e5270a2ade
+/workspaces/projeto-programacao-funcional/projetodamas.cabal:
+  hash: 185aafd10ef13065219d5ef149a6c54e66c61537273453e1c1a455a19e58fca3
+/workspaces/projeto-programacao-funcional/src/Lib.hs:
+  hash: d85f02b4ad88642dd92157d0d7cbf613fdbf5d7409bec5578159b5fa07fdcd55
