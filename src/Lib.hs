@@ -233,7 +233,7 @@ play board = do
 
 someFunc :: IO ()
 someFunc = do
-    let resultado = getCoordX ("d", 8)
-    print resultado
-   -- let newBoard = (createBoard 8)
-   -- play newBoard
+   let newBoard = (createBoard 8)
+   play newBoard
+    -- let resultado = getCoordX ("d", 8)
+    -- print resultado
