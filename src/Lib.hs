@@ -55,6 +55,18 @@ emptyBoard size = [[emptyCell (y + x) x y | x <- [0..size-1]] | y <- [0..size-1]
 createBoard :: Int -> Board
 createBoard size = [[initialSetCell (y + x) x y | x <- [0..size-1]] | y <- [0..size-1]]
 
+getCoordX :: (String, Int) -> Coord
+getCoordX ("a", n) = (0, n)
+getCoordX ("b", n) = (1, n)
+getCoordX ("c", n) = (2, n)
+getCoordX ("d", n) = (3, n)
+getCoordX ("e", n) = (4, n)
+getCoordX ("f", n) = (5, n)
+getCoordX ("g", n) = (6, n)
+getCoordX ("h", n) = (7, n)
+
+
+
 
 showCell :: Cell -> String
 showCell (content, color, coord) = color ++ show content ++ "\x1b[0m"  -- Reset da cor
@@ -132,7 +144,7 @@ verifyContent content = content == White
 showCasas :: [Coord] -> String
 showCasas x = show x
 
-removerPeca :: Board -> Int -> Int -> Board
+removerPeca :: Board -> Int -> Int -> Board -- board x y
 removerPeca board c r = 
     [[if r == y && c == x then emptyCell 1 c r else getCell board x y | x <- [0..7]] | y <- [0..7]]
 
@@ -221,5 +233,7 @@ play board = do
 
 someFunc :: IO ()
 someFunc = do
-    let newBoard = (createBoard 8)
-    play newBoard
+    let resultado = getCoordX ("d", 8)
+    print resultado
+   -- let newBoard = (createBoard 8)
+   -- play newBoard
