@@ -182,16 +182,16 @@ contemPecaOponente board content (a, b) =
 validMoves :: Board -> Coord -> Content -> [Coord]
 validMoves board (a, b) valor
   | a `elem` [0..7] && b `elem` [0..7] =
-      (if ehCasaLivre board (a-2,b-2) && (a-1) `elem` [0..7] && (b-1) `elem` [0..7] && contemPecaOponente board valor (a-1, b-1)
+      (if a-2 `elem` [0..7] && b-2 `elem` [0..7] && ehCasaLivre board (a-2,b-2) && (a-1) `elem` [0..7] && (b-1) `elem` [0..7] && contemPecaOponente board valor (a-1, b-1)
           then [(a-1, b-1)] 
           else []) ++ 
-      (if ehCasaLivre board (a+2,b-2) && (a+1) `elem` [0..7] && (b-1) `elem` [0..7] && contemPecaOponente board valor (a+1, b-1)
+      (if a+2 `elem` [0..7] && b-2 `elem` [0..7] && ehCasaLivre board (a+2,b-2) && (a+1) `elem` [0..7] && (b-1) `elem` [0..7] && contemPecaOponente board valor (a+1, b-1)
           then [(a+1, b-1)] 
           else []) ++
-      (if ehCasaLivre board (a+2,b+2) && (a+1) `elem` [0..7] && (b+1) `elem` [0..7] && contemPecaOponente board valor (a+1, b+1)
+      (if a+2 `elem` [0..7] && b+2 `elem` [0..7] && ehCasaLivre board (a+2,b+2) && (a+1) `elem` [0..7] && (b+1) `elem` [0..7] && contemPecaOponente board valor (a+1, b+1)
           then [(a+1, b+1)] 
           else []) ++
-      (if ehCasaLivre board (a-2,b+2) && (a-1) `elem` [0..7] && (b+1) `elem` [0..7] && contemPecaOponente board valor (a-1, b+1)
+      (if a-2 `elem` [0..7] && b+2 `elem` [0..7] && ehCasaLivre board (a-2,b+2) && (a-1) `elem` [0..7] && (b+1) `elem` [0..7] && contemPecaOponente board valor (a-1, b+1)
           then [(a-1, b+1)] 
           else [])
   | otherwise = []
@@ -226,56 +226,73 @@ mostrarNome :: Content -> Nome
 mostrarNome White = Brancas
 mostrarNome Black = Pretas
 
+somaJogadasDamas :: Content -> Int -> Int
+somaJogadasDamas WhiteDama jogadasDamas =  jogadasDamas + 1
+somaJogadasDamas BlackDama jogadasDamas =  jogadasDamas + 1
+somaJogadasDamas White jogadasDamas =  0
+somaJogadasDamas Black jogadasDamas =  0
+
+
+
 --inicia o jogo - é a função recursiva que mantem o jogo rodando recebendo tabuleiros atualizados com os movimentos
-play :: Board -> Content -> IO ()
-play board jogador = do
-    putStrLn "Tabuleiro atual:"
-    showBoard board
-    putStrLn $ "Vez das pecas " ++ show (mostrarNome jogador)
-    -- jogador <- getLine
-    -- let (valor) = read jogador :: Content
-    if length (posicoesOponente board jogador) > 0
+play :: Board -> Content -> Int -> IO ()
+play board jogador contagemMovimentoDamas = do
+    let resultado = validMoves board (3, 1) White
+    print resultado
+
+    if contagemMovimentoDamas <= 20
         then do
-            if length (obrigatorioComer board jogador) > 0
-                then do 
-                    let lele = obrigatorioComer board jogador
-                    print lele
-                    let novoTabuleiro = obrigatorioComerMov board jogador
-                    play novoTabuleiro (proxJogador jogador)
-                else do
-                    putStrLn "Digite a coordenada da peça que deseja movimentar (x,y):"
-                    input <- getLine
-                    let (xInicial, yInicial) = read input :: (String, Int)
-                    if ((getCoordX xInicial), yInicial) `elem` posicoesJogador board jogador
-                        then do
-                            let origCell = getCell board (getCoordX xInicial) yInicial
-                            if getContent origCell /= Empty
-                                then do
-                                    putStrLn "Digite a coordenada da posição final que deseja movimentar (x,y):"
-                                    input2 <- getLine
-                                    let (xFinal, yFinal) = read input2 :: (String, Int)
-                                    let destCell = getCell board (getCoordX(xFinal)) yFinal
-                                    if getContent destCell == Empty
-                                        then do
-                                            let validMove = ehMovimentoValido board (getCoordX(xInicial), yInicial) (getCoordX(xFinal), yFinal) (getContent origCell)
-                                            if validMove
-                                                then do
-                                                    let tabuleiroComMovimento = moverPeca board (getCoordX(xInicial), yInicial) (getCoordX(xFinal), yFinal)
-                                                    play tabuleiroComMovimento (proxJogador jogador)
+            putStrLn "Tabuleiro atual:"
+            showBoard board
+            putStrLn $ "Vez das pecas " ++ show (mostrarNome jogador)
+            if length (posicoesOponente board jogador) > 0
+                then do
+                    if length (obrigatorioComer board jogador) > 0
+                        then do 
+                            -- let lele = obrigatorioComer board jogador
+                            -- print lele
+                            let novoTabuleiro = obrigatorioComerMov board jogador
+                            play novoTabuleiro (proxJogador jogador) 0
+                            else do
+                                putStrLn "Digite a coordenada da peça que deseja movimentar (x,y):"
+                                input <- getLine
+                                let (xInicial, yInicial) = read input :: (String, Int)
+                                if ((getCoordX xInicial), yInicial) `elem` posicoesJogador board jogador
+                                    then do
+                                        let origCell = getCell board (getCoordX xInicial) yInicial
+                                        if getContent origCell /= Empty
+                                            then do
+                                                putStrLn "Digite a coordenada da posição final que deseja movimentar (x,y):"
+                                                input2 <- getLine
+                                                let (xFinal, yFinal) = read input2 :: (String, Int)
+                                                let destCell = getCell board (getCoordX(xFinal)) yFinal
+                                                if getContent destCell == Empty
+                                                    then do
+                                                        let validMove = ehMovimentoValido board (getCoordX(xInicial), yInicial) (getCoordX(xFinal), yFinal) (getContent origCell)
+                                                        if validMove
+                                                            then do
+                                                                let tabuleiroComMovimento = moverPeca board (getCoordX(xInicial), yInicial) (getCoordX(xFinal), yFinal)
+                                                                let jogadasDamas = somaJogadasDamas (getContent (getCell board (getCoordX xFinal) yFinal)) (contagemMovimentoDamas)
+                                                                play tabuleiroComMovimento (proxJogador jogador) jogadasDamas
+                                                            else do
+                                                                putStrLn "Movimento inválido."
+                                                                play board jogador contagemMovimentoDamas
                                                 else do
-                                                    putStrLn "Movimento inválido."
-                                                    play board jogador
-                                        else do
-                                            putStrLn "Posição final ocupada. Tente novamente."
-                                            play board jogador
-                                else do
-                                    putStrLn "Não há peça na posição inicial."
-                                    play board jogador
-                        else do
-                            putStrLn "Peça do oponente, favor tentar novamente."
-                            play board jogador
-        else do
-            putStrLn "Parabéns! Você ganhou."
+                                                    putStrLn "Posição final ocupada. Tente novamente."
+                                                    play board jogador contagemMovimentoDamas
+                                            else do
+                                                putStrLn "Não há peça na posição inicial."
+                                                play board jogador contagemMovimentoDamas
+                                    else do
+                                        putStrLn "Peça do oponente, favor tentar novamente."
+                                        play board jogador contagemMovimentoDamas
+                            else do
+                                putStrLn "Parabéns! Você ganhou."
+                    else do
+                        putStrLn "20 lances sucessivos de damas - isto é um empate!"
+
+    
+    
 
 
 
@@ -284,4 +301,4 @@ someFunc = do
    let newBoard = (createBoard 8)
 --    let resultado = validMoves newBoard (2, 5) White
 --    print resultado
-   play newBoard White
+   play newBoard White 0
