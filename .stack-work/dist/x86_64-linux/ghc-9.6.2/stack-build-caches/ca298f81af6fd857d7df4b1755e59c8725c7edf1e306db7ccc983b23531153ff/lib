@@ -8,11 +8,9 @@
   hash: b5c0c4af776da040bf6a22c225879fbf4cc247ab28f725a685f64ff4646e2943
 /workspaces/projeto-programacao-funcional/CHANGELOG.md:
   hash: b64ea318f2a77486033c1f449cf920d44add716915442b6ce3598a231445a856
-/workspaces/projeto-programacao-funcional/README.md:
-  hash: d1c1c305d73f118b4730f0eb1a2303340f03e3e66ce5b853d50410828d6bef0a
 /workspaces/projeto-programacao-funcional/package.yaml:
   hash: 4fed7a19e920f970263dff4df476ee5d0119703e3e093fd49f9042e5270a2ade
 /workspaces/projeto-programacao-funcional/projetodamas.cabal:
   hash: 185aafd10ef13065219d5ef149a6c54e66c61537273453e1c1a455a19e58fca3
 /workspaces/projeto-programacao-funcional/src/Lib.hs:
-  hash: 625e824edae7294d0e1000c6823174c6403541e67c7dab0162c05b8ca76f5df8
+  hash: ba5e50c8e11016b7566be99d796be0415dfdc1b5123c63ecf6508fb1db5fc3a8

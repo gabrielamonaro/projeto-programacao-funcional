@@ -3,6 +3,8 @@ module Lib
     ) where
 import Control.Monad (guard)
 import Data.List
+import Debug.Trace (trace)
+
 
 data Content = Black | White | Empty | WhiteDama | BlackDama deriving (Eq, Read)
 
@@ -187,25 +189,41 @@ posicoesJogador :: Board -> Content -> [Coord] -- retorna lista das posicoes do 
 posicoesJogador board valor = [(x,y) | x <- [0..7], y <- [0..7], (getContent (getCell board x y)) `elem` (getGrupo valor)]
 
 contemPecaOponente :: Board -> Content -> Coord -> Bool
-contemPecaOponente board content (a, b) = 
-    if((getContent (getCell board a b)) `elem` (oponente content)) then True else False
+contemPecaOponente board content (a, b) =
+    let
+        cellContent = getContent (getCell board a b)
+        opponentContents = oponente content
+    in
+    cellContent `elem` opponentContents
+
+
+
 
 validMoves :: Board -> Coord -> Content -> [Coord]
-validMoves board (a, b) valor
-  | a `elem` [0..7] && b `elem` [0..7] =
-      (if a-2 `elem` [0..7] && b-2 `elem` [0..7] && ehCasaLivre board (a-2,b-2) && (a-1) `elem` [0..7] && (b-1) `elem` [0..7] && contemPecaOponente board valor (a-1, b-1)
-          then [(a-1, b-1)] 
-          else []) ++ 
-      (if a+2 `elem` [0..7] && b-2 `elem` [0..7] && ehCasaLivre board (a+2,b-2) && (a+1) `elem` [0..7] && (b-1) `elem` [0..7] && contemPecaOponente board valor (a+1, b-1)
-          then [(a+1, b-1)] 
-          else []) ++
-      (if a+2 `elem` [0..7] && b+2 `elem` [0..7] && ehCasaLivre board (a+2,b+2) && (a+1) `elem` [0..7] && (b+1) `elem` [0..7] && contemPecaOponente board valor (a+1, b+1)
-          then [(a+1, b+1)] 
-          else []) ++
-      (if a-2 `elem` [0..7] && b+2 `elem` [0..7] && ehCasaLivre board (a-2,b+2) && (a-1) `elem` [0..7] && (b+1) `elem` [0..7] && contemPecaOponente board valor (a-1, b+1)
-          then [(a-1, b+1)] 
-          else [])
-  | otherwise = []
+validMoves board (a, b) valor =
+    -- Gera todos os movimentos válidos
+    [ (a-1, b-1) | a-2 `elem` [0..7]
+                , b-2 `elem` [0..7]
+                , ehCasaLivre board (a-2, b-2)
+                , contemPecaOponente board valor (a-1, b-1)
+                ] ++
+    [ (a+1, b-1) | a+2 `elem` [0..7]
+                , b-2 `elem` [0..7]
+                , ehCasaLivre board (a+2, b-2)
+                , contemPecaOponente board valor (a+1, b-1)
+                ] ++
+    [ (a+1, b+1) | a+2 `elem` [0..7]
+                , b+2 `elem` [0..7]
+                , ehCasaLivre board (a+2, b+2)
+                , contemPecaOponente board valor (a+1, b+1)
+                ] ++
+    [ (a-1, b+1) | a-2 `elem` [0..7]
+                , b+2 `elem` [0..7]
+                , ehCasaLivre board (a-2, b+2)
+                , contemPecaOponente board valor (a-1, b+1)
+                ]
+
+
 
 printAndReturn :: Coord -> IO ()
 printAndReturn coord = do
@@ -217,15 +235,16 @@ proxJogador White = Black
 
 obrigatorioComer :: Board -> Content -> [Coord]
 obrigatorioComer board valor = do 
-    (a,b) <- posicoesJogador board valor
-    (c,d) <- posicoesOponente board valor
+    (a, b) <- posicoesJogador board valor
+    (c, d) <- posicoesOponente board valor
     guard $ a `elem` [0..7] && b `elem` [0..7]
-    guard $ (a+2) `elem` [0..7] && (b+2) `elem` [0..7] && (a-2) `elem` [0..7] && (b-2) `elem` [0..7]
-    guard $ (a+1) `elem` [0..7] && (b+1) `elem` [0..7] && (a-1) `elem` [0..7] && (b-1) `elem` [0..7]
-    let moves = validMoves board (a,b) valor
+    guard $ (a+2) `elem` [0..7] || (b+2) `elem` [0..7] || (a-2) `elem` [0..7] || (b-2) `elem` [0..7]
+    guard $ (a+1) `elem` [0..7] || (b+1) `elem` [0..7] || (a-1) `elem` [0..7] || (b-1) `elem` [0..7]
+    let moves = validMoves board (a, b) valor
     guard $ (c+1) `elem` [0..7] && (d+1) `elem` [0..7] && (c-1) `elem` [0..7] && (d-1) `elem` [0..7]
-    guard $ (c,d) `elem` moves && (ehCasaLivre board (c+1,d+1) || ehCasaLivre board (c-1,d+1) || ehCasaLivre board (c-1,d-1) || ehCasaLivre board (c+1,d-1))
+    guard $ (c, d) `elem` moves && (ehCasaLivre board (c+1, d+1) || ehCasaLivre board (c-1, d+1) || ehCasaLivre board (c-1, d-1) || ehCasaLivre board (c+1, d-1))
     return (a, b)
+
 
 obrigatorioComerMov :: Board -> Content -> Board
 obrigatorioComerMov board valor = 
