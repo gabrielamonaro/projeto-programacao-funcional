@@ -1,0 +1,16 @@
+? /home/gabriela/.stack/programs/x86_64-linux/ghc-tinfo6-9.6.2/lib/ghc-9.6.2/lib/x86_64-linux-ghc-9.6.2/rts-1.0.2/include/ghcversion.h
+: hash: 9cac75f8cd439ea32123c78b066817c642e99d5f6683e675c327513f36e1532e
+? /home/gabriela/Documents/haskell/projeto-programacao-funcional/.stack-work/dist/x86_64-linux-tinfo6/ghc-9.6.2/build/autogen/Paths_projetodamas.hs
+: hash: 3a7fcc6caa4c2bd458e1da3b2ec171fe47a779375e643abea3958dfc4accd819
+? /home/gabriela/Documents/haskell/projeto-programacao-funcional/.stack-work/dist/x86_64-linux-tinfo6/ghc-9.6.2/build/autogen/cabal_macros.h
+: hash: e57cdc5251d3f980c14838614775cb4a30239e4b3169164804cc3c6aad21e8e3
+/home/gabriela/Documents/haskell/projeto-programacao-funcional/CHANGELOG.md:
+  hash: b64ea318f2a77486033c1f449cf920d44add716915442b6ce3598a231445a856
+/home/gabriela/Documents/haskell/projeto-programacao-funcional/package.yaml:
+  hash: 1b4af689e9e1fc94cb2e9aa4553d17319aebe0ebd6e82e00c89bd969bfd88efc
+/home/gabriela/Documents/haskell/projeto-programacao-funcional/projetodamas.cabal:
+  hash: 18c36205f94d715ac40f6a9f0bd66cbda09eb0361dd50fb2c8dc5fd4581397f0
+/home/gabriela/Documents/haskell/projeto-programacao-funcional/src/Lib.hs:
+  hash: 42b971b1e3e407c6a6ce2102c3e0e32d2e71be74801cd6e36e56bba569ce4e7c
+/usr/include/stdc-predef.h:
+  hash: cb08cd5d4cc059a90833ac48a284d25016e8d56ded8ad4cd98d8ac59cc5053f3

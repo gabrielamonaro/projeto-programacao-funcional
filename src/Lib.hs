@@ -4,6 +4,9 @@ module Lib
 import Control.Monad (guard)
 import Data.List
 import Debug.Trace (trace)
+import System.Random (randomRIO)
+
+
 
 
 data Content = Black | White | Empty | WhiteDama | BlackDama deriving (Eq, Read)
@@ -127,6 +130,8 @@ movePiece board (x, y) (x', y') =
 ehCasaLivre :: Board -> Coord -> Bool
 ehCasaLivre board (c, r) = getContent (getCell board c r) == Empty
 
+
+
 comerPeca :: Board -> Coord -> Content -> [Coord]
 comerPeca board (c, r) valor = 
     [(c+2, y) | y <- [r+2, r-2], 
@@ -175,11 +180,11 @@ removerPeca board c r =
     [[if r == y && c == x then emptyCell 1 c r else getCell board x y | x <- [0..7]] | y <- [0..7]]
 
 moverPeca :: Board -> Coord -> Coord -> Board
-moverPeca board (c, r) movimento = 
-    if ehMovimentoValido board (c, r) movimento (getContent (getCell board c r))
-        then if abs (fst movimento - c) == 2 && abs (snd movimento - r) == 2
-                 then movePiece (removerPeca board (c + div (fst movimento - c) 2) (r + div (snd movimento - r) 2)) (c, r) movimento
-                 else movePiece board (c, r) movimento
+moverPeca board (c, r) (c1, r1) = 
+    if c >= 0 && r >= 0 && c1 >= 0 && r1 >= 0 && ehMovimentoValido board (c, r) (c1, r1) (getContent (getCell board c r))
+        then if abs (fst (c1, r1) - c) == 2 && abs (snd (c1, r1) - r) == 2
+                 then movePiece (removerPeca board (c + div (fst (c1, r1) - c) 2) (r + div (snd (c1, r1) - r) 2)) (c, r) (c1, r1)
+                 else movePiece board (c, r) (c1, r1)
         else board
 
 posicoesOponente :: Board -> Content -> [Coord] -- retorna lista das posicoes do oponente
@@ -198,31 +203,74 @@ contemPecaOponente board content (a, b) =
 
 
 
+-- validMoves :: Board -> Coord -> Content -> [Coord]
+-- validMoves board (a, b) valor =
+--     -- Gera todos os movimentos válidos
+--     [ (a-1, b-1) | a-2 `elem` [0..7]
+--                 , b-2 `elem` [0..7]
+--                 , ehCasaLivre board (a-2, b-2)
+--                 , contemPecaOponente board valor (a-1, b-1)
+--                 ] ++
+--     [ (a+1, b-1) | a+2 `elem` [0..7]
+--                 , b-2 `elem` [0..7]
+--                 , ehCasaLivre board (a+2, b-2)
+--                 , contemPecaOponente board valor (a+1, b-1)
+--                 ] ++
+--     [ (a+1, b+1) | a+2 `elem` [0..7]
+--                 , b+2 `elem` [0..7]
+--                 , ehCasaLivre board (a+2, b+2)
+--                 , contemPecaOponente board valor (a+1, b+1)
+--                 ] ++
+--     [ (a-1, b+1) | a-2 `elem` [0..7]
+--                 , b+2 `elem` [0..7]
+--                 , ehCasaLivre board (a-2, b+2)
+--                 , contemPecaOponente board valor (a-1, b+1)
+--                 ]
 
-validMoves :: Board -> Coord -> Content -> [Coord]
-validMoves board (a, b) valor =
-    -- Gera todos os movimentos válidos
-    [ (a-1, b-1) | a-2 `elem` [0..7]
-                , b-2 `elem` [0..7]
-                , ehCasaLivre board (a-2, b-2)
-                , contemPecaOponente board valor (a-1, b-1)
-                ] ++
-    [ (a+1, b-1) | a+2 `elem` [0..7]
-                , b-2 `elem` [0..7]
-                , ehCasaLivre board (a+2, b-2)
-                , contemPecaOponente board valor (a+1, b-1)
-                ] ++
-    [ (a+1, b+1) | a+2 `elem` [0..7]
-                , b+2 `elem` [0..7]
-                , ehCasaLivre board (a+2, b+2)
-                , contemPecaOponente board valor (a+1, b+1)
-                ] ++
-    [ (a-1, b+1) | a-2 `elem` [0..7]
-                , b+2 `elem` [0..7]
-                , ehCasaLivre board (a-2, b+2)
-                , contemPecaOponente board valor (a-1, b+1)
-                ]
+-- validMoves :: Board -> Coord -> Content -> [Coord]
+-- validMoves board (a, b) valor =
+--     trace ("Validando movimentos para coordenada: " ++ show (a, b)) $
+--     trace ("Movimentos válidos: " ++ show movimentos) movimentos
+--   where
+--     movimentos = [ (a-1, b-1) | a-2 >= 0, b-2 >= 0, ehCasaLivre board (a-2, b-2), contemPecaOponente board valor (a-1, b-1) ] ++
+--                  [ (a+1, b-1) | a+2 <= 7, b-2 >= 0, ehCasaLivre board (a+2, b-2), contemPecaOponente board valor (a+1, b-1) ] ++
+--                  [ (a+1, b+1) | a+2 <= 7, b+2 <= 7, ehCasaLivre board (a+2, b+2), contemPecaOponente board valor (a+1, b+1) ] ++
+--                  [ (a-1, b+1) | a-2 >= 0, b+2 <= 7, ehCasaLivre board (a-2, b+2), contemPecaOponente board valor (a-1, b+1) ]
 
+validMoves :: Board -> Coord  -> Content -> [Coord]
+validMoves board  (x, y) content=
+    let
+        movimentos = [(x + dx, y + dy) | (dx, dy) <- [(1,1), (1,-1), (-1,1), (-1,-1)]]
+        movimentosValidos = filter (\(nx, ny) -> ehNoTabuleiro (nx, ny) && ehCasaLivre board (nx, ny)) movimentos
+        movimentosComCaptura = filter (\(nx, ny) -> contemPecaOponente board content (nx, ny) && ehCasaLivre board (nx + 2 * (nx - x), ny + 2 * (ny - y))) movimentosValidos
+    in
+        movimentosComCaptura ++ movimentosValidos
+
+ehNoTabuleiro :: Coord -> Bool
+ehNoTabuleiro (x, y) = x >= 0 && x < 8 && y >= 0 && y < 8
+
+
+posicoesPretas :: Board -> [Coord] 
+posicoesPretas board = [(x,y) | x <- [0..7], y <- [0..7], (getContent (getCell board x y)) `elem` (oponente White)]
+
+
+possiveisMovimentos :: Board -> [Coord] -> [(Coord, Coord)]
+possiveisMovimentos board coords = 
+    [(origem, destino) | origem <- coords,
+                          destino <- validMoves board origem Black]
+  where
+    validMovesResults = [validMoves board origem Black | origem <- coords]
+
+
+pegaMovimentoAleatorio :: Board -> IO (Coord, Coord)
+pegaMovimentoAleatorio board = do
+    let possiveisMov = possiveisMovimentos board (posicoesPretas board)
+    if null possiveisMov
+        then do 
+            return ((-1, -1), (-1, -1))
+        else do
+            randomNumber <- randomRIO (0, length possiveisMov - 1)
+            return (possiveisMov !! randomNumber)
 
 
 printAndReturn :: Coord -> IO ()
@@ -303,7 +351,104 @@ play board jogador contagemMovimentoDamas
                     else putStrLn "Não há peça na posição inicial." >> play board jogador contagemMovimentoDamas
             else putStrLn "Peça do oponente, favor tentar novamente." >> play board jogador contagemMovimentoDamas
 
+--inicia o jogo - é a função recursiva que mantem o jogo rodando recebendo tabuleiros atualizados com os movimentos
+playAuto :: Board -> Content -> Int -> IO ()
+playAuto board jogador contagemMovimentoDamas
+    | contagemMovimentoDamas >= 20 = putStrLn "Empate!"
+    | null (posicoesOponente board jogador) = putStrLn $ "Parabéns, " ++ show (mostrarNome jogador) ++ ", você ganhou."
+    | not (null (obrigatorioComer board jogador)) = do
+        let novoTabuleiro = obrigatorioComerMov board jogador
+        playAuto novoTabuleiro (proxJogador jogador) 0
+    | otherwise = do
+        putStrLn "Tabuleiro atual:"
+        showBoard board
+        putStrLn $ "Vez das pecas " ++ show (mostrarNome jogador)
+        if jogador == Black 
+            then do
+                (origem, destino) <- pegaMovimentoAleatorio board
+                let novoTabuleiro = moverPeca board origem destino
+                playAuto novoTabuleiro (proxJogador jogador) (contagemMovimentoDamas + 1)
+            else do
+                putStrLn "Digite a coordenada da peça que deseja movimentar (x,y):"
+                input <- getLine
+                let (xInicial, yInicial) = read input :: (String, Int)
+                if (getCoordX xInicial, yInicial) `elem` posicoesJogador board jogador
+                    then do
+                        let origCell = getCell board (getCoordX xInicial) yInicial
+                        if getContent origCell /= Empty
+                            then do
+                                putStrLn "Digite a coordenada da posição final que deseja movimentar (x,y):"
+                                input2 <- getLine
+                                let (xFinal, yFinal) = read input2 :: (String, Int)
+                                let destCell = getCell board (getCoordX xFinal) yFinal
+                                if getContent destCell == Empty
+                                    then do
+                                        let validMove = ehMovimentoValido board (getCoordX xInicial, yInicial) (getCoordX xFinal, yFinal) (getContent origCell)
+                                        if validMove
+                                            then do
+                                                let tabuleiroComMovimento = moverPeca board (getCoordX xInicial, yInicial) (getCoordX xFinal, yFinal)
+                                                let jogadasDamas = somaJogadasDamas (getContent destCell) contagemMovimentoDamas
+                                                playAuto tabuleiroComMovimento (proxJogador jogador) jogadasDamas
+                                            else putStrLn "Movimento inválido." >> playAuto board jogador contagemMovimentoDamas
+                                    else putStrLn "Posição final ocupada. Tente novamente." >> playAuto board jogador contagemMovimentoDamas
+                            else putStrLn "Não há peça na posição inicial." >> playAuto board jogador contagemMovimentoDamas
+                    else putStrLn "Peça do oponente, favor tentar novamente." >> playAuto board jogador contagemMovimentoDamas
+                
+
+
+-- inicia o jogo - é a função recursiva que mantem o jogo rodando recebendo tabuleiros atualizados com os movimentos
+-- playAuto :: Board -> Content -> Int -> IO ()
+-- playAuto board jogador contagemMovimentoDamas
+--     | contagemMovimentoDamas >= 20 = putStrLn "Empate!"
+--     | null (posicoesOponente board jogador) = 
+--         if jogador == White 
+--             then putStrLn "Parabéns, você ganhou." 
+--             else putStrLn "Que pena, você perdeu."
+--     | not (null (obrigatorioComer board jogador)) = do
+--         let novoTabuleiro = obrigatorioComerMov board jogador
+--         playAuto novoTabuleiro (proxJogador jogador) 0
+--     | otherwise = do
+--         putStrLn "Tabuleiro atual:"
+--         showBoard board
+--         putStrLn $ "Vez das pecas " ++ show (mostrarNome jogador)
+--         if jogador == White
+--             then do
+--                 putStrLn "Digite a coordenada da peça que deseja movimentar (x,y):"
+--                 input <- getLine
+--                 let (xInicial, yInicial) = read input :: (Int, Int)
+--                 if (getCoordX xInicial, yInicial) `elem` posicoesJogador board jogador
+--                     then do
+--                         let origCell = getCell board (getCoordX xInicial) yInicial
+--                         if getContent origCell /= Empty
+--                             then do
+--                                 putStrLn "Digite a coordenada da posição final que deseja movimentar (x,y):"
+--                                 input2 <- getLine
+--                                 let (xFinal, yFinal) = read input2 :: (Int, Int)
+--                                 let destCell = getCell board (getCoordX xFinal) yFinal
+--                                 if getContent destCell == Empty
+--                                     then do
+--                                         let validMove = ehMovimentoValido board (getCoordX xInicial, yInicial) (getCoordX xFinal, yFinal) (getContent origCell)
+--                                         if validMove
+--                                             then do
+--                                                 let tabuleiroComMovimento = moverPeca board (getCoordX xInicial, yInicial) (getCoordX xFinal, yFinal)
+--                                                 let jogadasDamas = somaJogadasDamas (getContent destCell) contagemMovimentoDamas
+--                                                 playAuto tabuleiroComMovimento (proxJogador jogador) jogadasDamas
+--                                             else putStrLn "Movimento inválido." >> playAuto board jogador contagemMovimentoDamas
+--                                     else putStrLn "Posição final ocupada. Tente novamente." >> playAuto board jogador contagemMovimentoDamas
+--                             else putStrLn "Não há peça na posição inicial." >> playAuto board jogador contagemMovimentoDamas
+--                     else putStrLn "Peça do oponente, favor tentar novamente." >> playAuto board jogador contagemMovimentoDamas
+--             else do
+--                 (origem, destino) <- pegaMovimentoAleatorio board
+--                 let novoTabuleiro = moverPeca board origem destino
+--                 playAuto novoTabuleiro (proxJogador jogador) (contagemMovimentoDamas + 1)
+
+
+        
+        
+
+
+
 someFunc :: IO ()
 someFunc = do
    let newBoard = (createBoard 8)
-   play newBoard White 0
+   playAuto newBoard White 0
