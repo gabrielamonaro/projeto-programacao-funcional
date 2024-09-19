@@ -237,6 +237,7 @@ contemPecaOponente board content (a, b) =
 --                  [ (a+1, b+1) | a+2 <= 7, b+2 <= 7, ehCasaLivre board (a+2, b+2), contemPecaOponente board valor (a+1, b+1) ] ++
 --                  [ (a-1, b+1) | a-2 >= 0, b+2 <= 7, ehCasaLivre board (a-2, b+2), contemPecaOponente board valor (a-1, b+1) ]
 
+-- usei chatGPT para refatorar essa funcao validMoves
 validMoves :: Board -> Coord  -> Content -> [Coord]
 validMoves board  (x, y) content=
     let
@@ -254,6 +255,7 @@ posicoesPretas :: Board -> [Coord]
 posicoesPretas board = [(x,y) | x <- [0..7], y <- [0..7], (getContent (getCell board x y)) `elem` (oponente White)]
 
 
+-- possiveisMovimentos teve auxilio do chatGPT em sua implementacao
 possiveisMovimentos :: Board -> [Coord] -> [(Coord, Coord)]
 possiveisMovimentos board coords = 
     [(origem, destino) | origem <- coords,
