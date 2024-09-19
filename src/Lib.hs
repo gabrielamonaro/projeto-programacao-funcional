@@ -393,62 +393,18 @@ playAuto board jogador contagemMovimentoDamas
                                     else putStrLn "Posição final ocupada. Tente novamente." >> playAuto board jogador contagemMovimentoDamas
                             else putStrLn "Não há peça na posição inicial." >> playAuto board jogador contagemMovimentoDamas
                     else putStrLn "Peça do oponente, favor tentar novamente." >> playAuto board jogador contagemMovimentoDamas
-                
-
-
--- inicia o jogo - é a função recursiva que mantem o jogo rodando recebendo tabuleiros atualizados com os movimentos
--- playAuto :: Board -> Content -> Int -> IO ()
--- playAuto board jogador contagemMovimentoDamas
---     | contagemMovimentoDamas >= 20 = putStrLn "Empate!"
---     | null (posicoesOponente board jogador) = 
---         if jogador == White 
---             then putStrLn "Parabéns, você ganhou." 
---             else putStrLn "Que pena, você perdeu."
---     | not (null (obrigatorioComer board jogador)) = do
---         let novoTabuleiro = obrigatorioComerMov board jogador
---         playAuto novoTabuleiro (proxJogador jogador) 0
---     | otherwise = do
---         putStrLn "Tabuleiro atual:"
---         showBoard board
---         putStrLn $ "Vez das pecas " ++ show (mostrarNome jogador)
---         if jogador == White
---             then do
---                 putStrLn "Digite a coordenada da peça que deseja movimentar (x,y):"
---                 input <- getLine
---                 let (xInicial, yInicial) = read input :: (Int, Int)
---                 if (getCoordX xInicial, yInicial) `elem` posicoesJogador board jogador
---                     then do
---                         let origCell = getCell board (getCoordX xInicial) yInicial
---                         if getContent origCell /= Empty
---                             then do
---                                 putStrLn "Digite a coordenada da posição final que deseja movimentar (x,y):"
---                                 input2 <- getLine
---                                 let (xFinal, yFinal) = read input2 :: (Int, Int)
---                                 let destCell = getCell board (getCoordX xFinal) yFinal
---                                 if getContent destCell == Empty
---                                     then do
---                                         let validMove = ehMovimentoValido board (getCoordX xInicial, yInicial) (getCoordX xFinal, yFinal) (getContent origCell)
---                                         if validMove
---                                             then do
---                                                 let tabuleiroComMovimento = moverPeca board (getCoordX xInicial, yInicial) (getCoordX xFinal, yFinal)
---                                                 let jogadasDamas = somaJogadasDamas (getContent destCell) contagemMovimentoDamas
---                                                 playAuto tabuleiroComMovimento (proxJogador jogador) jogadasDamas
---                                             else putStrLn "Movimento inválido." >> playAuto board jogador contagemMovimentoDamas
---                                     else putStrLn "Posição final ocupada. Tente novamente." >> playAuto board jogador contagemMovimentoDamas
---                             else putStrLn "Não há peça na posição inicial." >> playAuto board jogador contagemMovimentoDamas
---                     else putStrLn "Peça do oponente, favor tentar novamente." >> playAuto board jogador contagemMovimentoDamas
---             else do
---                 (origem, destino) <- pegaMovimentoAleatorio board
---                 let novoTabuleiro = moverPeca board origem destino
---                 playAuto novoTabuleiro (proxJogador jogador) (contagemMovimentoDamas + 1)
-
-
+                      
         
-        
-
-
+playZero :: Board -> IO()
+playZero board = do
+    putStrLn "Digite 1 para jogar sozinho com o computador, e 2 para jogar com outro adversário usuário: "
+    input <- getLine
+    let tipoDeJogo = read input :: Int
+    if tipoDeJogo == 1 then playAuto board White 0 else play board White 0
 
 someFunc :: IO ()
 someFunc = do
    let newBoard = (createBoard 8)
-   playAuto newBoard White 0
+   playZero newBoard
+--    playAuto newBoard White 0
+
